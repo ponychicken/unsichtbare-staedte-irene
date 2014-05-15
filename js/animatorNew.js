@@ -59,7 +59,9 @@ var i = 0;
 //   });
 //
 // }, true);
-
+function mapNumber(X,A,B,C,D) {
+  return (X-A)/(B-A) * (D-C) + C;
+}
 
 function setupPerspective() {
   var front = I.select('#Front'), back = I.select('#Back'), sky = I.select('#Sky');
@@ -67,14 +69,17 @@ function setupPerspective() {
   var text = I.select('#TextEbene');
 
   front.setDepth(-30);
-  back.setDepth(2);
+  back.setDepth(20);
   //sky.setDepth(1);
 
   buildings.forEach(function (item) {
     var bbox = item.getBBox();
     // Between 900 (near) and 500 (far)
     // Middle at 680
-    var z = -(bbox.y2 - 680)/100;
+    var shift = -(bbox.y2 - 680);
+    console.log("Shift", shift);
+    var z = mapNumber(shift, -250, 200, -15, 10);
+    //console.log(z);
     item.setDepth(z);
   });
 
