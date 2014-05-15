@@ -114,14 +114,6 @@ function wiggleAllPoints(amplitude, longitude, el) {
   }
 }
 
-function movePointFn(point) {
-  var mover = function (value) {
-    console.log(value);
-    point.x = value + point.xOrig;
-  };
-  return mover;
-}
-
 function animateFn(point, distance, duration, axis) {
   var animate = function () {
     var mover = function (value) {
@@ -145,32 +137,4 @@ function wigglePointFn(point, amplitude, longitude ) {
 
 function Sin(amplitude, longitude, offset, t) {
   return (amplitude * Math.sin(offset + t/longitude));
-}
-
-function animateSlider() {
-  $('input').hide();
-  var prefix = 1;
-  var i = 0;
-  var pos = 0;
-  var pause = 0;
-
-  setInterval(function () {
-    if (pause) {
-      pause--;
-      return;
-    }
-
-    pos = mina.easeinout(i/50)*50;
-    $('input').val(pos);
-    movePerspective(pos);
-    if (i == 50) {
-      prefix = -1;
-      pause = 10;
-    } else if (i == 0) {
-      prefix = 1;
-      pause = 10;
-    }
-    i += prefix;
-
-  }, 20);
 }
