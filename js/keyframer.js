@@ -1,14 +1,17 @@
 var KeyframedObject = function (object) {
   this.object = object
   this.keyframes = [];
+  this.keyframeIndex = [];
 }
 
 KeyframedObject.prototype.addKeyframe = function (t, data) {
   data.time = t;
   this.keyframes[t] = data;
+  this.keyframeIndex.push(t);
+  this.keyframeIndex.sort();
 }
 
-KeyframeObject.prototype.getInterpolated = function (wantedT) {
+KeyframedObject.prototype.getInterpolated = function (wantedT) {
   function isNum(v) {
     return typeof v == 'number'
   }
@@ -18,13 +21,13 @@ KeyframeObject.prototype.getInterpolated = function (wantedT) {
     return this.keyframes[wantedT];
   }
   // First find the closest two keys
-  for (var t in this.keyframes) {
+  for (var i = 0; i < this.keyframeIndex.length; i++) {
+    var t = this.keyframeIndex[i];
     if (t < wantedT) {
       var a = t
-    }
-    if (t > wantedT && b == undefined) {
+    } else if (t > wantedT && b == undefined) {
       var b = t;
-      return;
+      break;
     }
   }
 
@@ -41,10 +44,18 @@ KeyframeObject.prototype.getInterpolated = function (wantedT) {
 }
 
 KeyframedObject.prototype.interpolateObjects = function (objA, objB, wantedT) {
-  var newObj;
+  var newObj = {};
   function mapNumber(X,A,B,C,D) {
+    //Safe mode
+    X += 1000;
+    A += 1000;
+    B += 1000;
+
     return (X-A)/(B-A) * (D-C) + C;
+    //return C + (D - C) * ((X - A) / (B - A));
+
   }
+
   for (var key in objA) {
     if (objB[key] != undefined) {
       newObj[key] = mapNumber(wantedT, objA.time, objB.time, objA[key], objB[key]);

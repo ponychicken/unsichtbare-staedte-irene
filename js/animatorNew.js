@@ -69,11 +69,15 @@ function mapNumber(X,A,B,C,D) {
 function setupPerspective() {
   var front = I.select('#Front'), back = I.select('#Back'), sky = I.select('#Sky');
   var buildings = I.selectAll('#City > *');
-  var text = I.select('#Text');
+  var text = I.select('#Text'), textChildren = I.selectAll('#Text > *');
 
-  front.setDepth(-30);
+  front.setDepth(-60);
   back.setDepth(20);
-  //sky.setDepth(1);
+  //text.setDepth(-30);
+  textChildren[0].setDepth(-30);
+  textChildren[1].setDepth(-33);
+  textChildren[2].setDepth(-45);
+  sky.setDepth(-2);
 
   buildings.forEach(function (item) {
     var bbox = item.getBBox();
@@ -85,12 +89,42 @@ function setupPerspective() {
     //console.log(z);
     item.setDepth(z);
   });
+  curPos = -87;
+  movePerspective(curPos);
 
+  function cloudMover(name, x) {
+    var cloud = new KeyframedObject(I.select(name));
+    console.log(cloud.object.attr('opacity'));
+    cloud.addKeyframe(-80, {x:0, y:0, opacity:parseFloat(cloud.object.attr('opacity')*1.1)});
+    cloud.addKeyframe(0, {x:x, y:0, opacity:0});
+    //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
+    return cloud;
+  }
 
+  // Setup clouds
+  keyFramedObjects.push(cloudMover('#Cloud1', -400));
+  keyFramedObjects.push(cloudMover('#Cloud2', -900));
+  keyFramedObjects.push(cloudMover('#Cloud3', 400));
+  keyFramedObjects.push(cloudMover('#Cloud4', 400));
+  keyFramedObjects.push(cloudMover('#Cloud5', 200));
+  keyFramedObjects.push(cloudMover('#Cloud6', -200));
 }
 
 function movePerspective(value) {
   I.circularDisplace(value);
+  keyFramedObjects.forEach(function (item) {
+    var props = item.getInterpolated(value);
+
+    // Special casing
+    if (props.x || props.y) {
+      console.log("Putting a cloud at", props.x );
+      item.object.transform('translate(' + props.x + ',' + props.y + ')');
+    }
+    if (props.opacity) {
+      console.log('opacity:', props.opacity);
+      item.object.attr({opacity: props.opacity});
+    }
+  });
   //sun.transform('translate(0,' + 2.5*value + ')');
   var color = gradientYellowWhite.colourAt(value);
   I.select('#SkyBack').attr({fill: color});
