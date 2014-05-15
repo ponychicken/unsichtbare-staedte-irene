@@ -2,6 +2,9 @@ var I;
 var gradientYellowWhite = new Rainbow().setSpectrum('#CC874A','#C6BAB0').setNumberRange(0,50);
 var curPos = 0;
 
+var keyFramedObjects = [];
+
+
 
 Snap.load('new7.svg', function (data) {
     I = Snap('#svg');
@@ -66,7 +69,7 @@ function mapNumber(X,A,B,C,D) {
 function setupPerspective() {
   var front = I.select('#Front'), back = I.select('#Back'), sky = I.select('#Sky');
   var buildings = I.selectAll('#City > *');
-  var text = I.select('#TextEbene');
+  var text = I.select('#Text');
 
   front.setDepth(-30);
   back.setDepth(20);
@@ -83,6 +86,7 @@ function setupPerspective() {
     item.setDepth(z);
   });
 
+
 }
 
 function movePerspective(value) {
@@ -90,6 +94,7 @@ function movePerspective(value) {
   //sun.transform('translate(0,' + 2.5*value + ')');
   var color = gradientYellowWhite.colourAt(value);
   I.select('#SkyBack').attr({fill: color});
+  console.log("At perspective value", value);
 }
 
 
