@@ -1,0 +1,37 @@
+<html>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=768, minimal-ui">
+
+<script src="js/zepto.js"></script>
+<script src="js/hammer.js"></script>
+<script src="js/colorGradient.js"></script>
+<script src="js/snap.svg.js"></script>
+<script src="js/animator.js"></script>
+<style>
+@font-face {
+  font-family: 'OratorStd-Slanted';
+  src: url('fonts/OratorStd-Slanted.eot'); /* IE9 Compat Modes */
+  src: url('fonts/OratorStd-Slanted.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('fonts/OratorStd-Slanted.woff') format('woff'), /* Modern Browsers */
+       url('fonts/OratorStd-Slanted.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('fonts/OratorStd-Slanted.svg#de86ea2e26e072b9ff58568a5967db0b') format('svg'); /* Legacy iOS */
+
+  font-style:   normal;
+  font-weight:  400;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+</style>
+<script>
+document.ontouchmove = function(event){
+    event.preventDefault();
+}
+</script>
+<body>
+<div id="wrapper">
+  <img src="new4.svg" width=768 height=1024/>
+</div>
+<!-- <input type=range value=0 style="width:1024px"> -->
