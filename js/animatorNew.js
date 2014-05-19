@@ -45,7 +45,7 @@ function setupAnimations(I) {
     event.gesture.preventDefault();
     event.gesture.stopPropagation();
 
-    var calculatedPos = initial + event.gesture.deltaX/10;
+    var calculatedPos = initial - event.gesture.deltaX/10;
     curPos = calculatedPos;
     movePerspective(curPos);
   });
@@ -89,8 +89,6 @@ function setupPerspective() {
     //console.log(z);
     item.setDepth(z);
   });
-  curPos = -87;
-  movePerspective(curPos);
 
   function cloudMover(name, x) {
     var cloud = new KeyframedObject(I.select(name));
@@ -101,6 +99,14 @@ function setupPerspective() {
     return cloud;
   }
 
+  function opacityMover(name, xFrom, xTo, oFrom, oTo) {
+    var el = new KeyframedObject(I.select(name));
+    el.addKeyframe(-80, {x:xFrom, y:0, opacity:oFrom});
+    el.addKeyframe(0, {x:xTo, y:0, opacity:oTo});
+    //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
+    return el;
+  }
+
   // Setup clouds
   keyFramedObjects.push(cloudMover('#Cloud1', -400));
   keyFramedObjects.push(cloudMover('#Cloud2', -900));
@@ -108,9 +114,19 @@ function setupPerspective() {
   keyFramedObjects.push(cloudMover('#Cloud4', 400));
   keyFramedObjects.push(cloudMover('#Cloud5', 200));
   keyFramedObjects.push(cloudMover('#Cloud6', -200));
+  keyFramedObjects.push(opacityMover('#Rock', 0,0,0.4,1));
+
+
+
+
+  // Last call
+  curPos = -87;
+  movePerspective(curPos);
+
 }
 
 function movePerspective(value) {
+  if (value < -85) value = -85;
   I.circularDisplace(value);
   keyFramedObjects.forEach(function (item) {
     var props = item.getInterpolated(value);
