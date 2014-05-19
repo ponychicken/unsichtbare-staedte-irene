@@ -6,7 +6,7 @@ var keyFramedObjects = [];
 loadSVG();
 
 function loadSVG() {
-  $.get('/new7.svg', function(response) {
+  $.get('/new10 Kopie.svg', function(response) {
     // TODO: Doc fragment
     var frag = $('#hiddenWrapper');
     frag.append(response);
@@ -59,28 +59,28 @@ function setup(frag) {
   var pause = 0;
 
 
-  // var wiggled = I.scene.getById('City').getByType(Two.Polygon);
-  // _.extend(wiggled, I.scene.getById('Clouds').getByType(Two.Polygon));
-  // wiggled.forEach(function(item) {
-  //   item.vertices.forEach(function(anchor) {
-  //     anchor.origin = new Two.Vector().copy(anchor);
-  //   });
-  // });
+  var wiggled = I.scene.getById('City').getByType(Two.Polygon);
+  _.extend(wiggled, I.scene.getById('Clouds').getByType(Two.Polygon));
+  wiggled.forEach(function(item) {
+    item.vertices.forEach(function(anchor) {
+      anchor.origin = new Two.Vector().copy(anchor);
+    });
+  });
 
   I.bind('update', function(frameCount) {
     if (curPos != lastPos) {
       lastPos = curPos;
       movePerspective(curPos);
     }
-    // if (!(frameCount % 5)) {
-    //   wiggled.forEach(function(item) {
-    //     item.vertices.forEach(function(anchor) {
-    //       var wiggle = (item.z) ? (item.z - 100)/-75 : 1.5;
-    //       anchor.x = anchor.origin.x + Math.random() * wiggle;
-    //       anchor.y = anchor.origin.y + Math.random() * wiggle;
-    //     });
-    //   });
-    // }
+    if (!(frameCount % 5)) {
+      wiggled.forEach(function(item) {
+        item.vertices.forEach(function(anchor) {
+          var wiggle = (item.z) ? (item.z - 100)/-75 : 1.5;
+          anchor.x = anchor.origin.x + Math.random() * wiggle;
+          anchor.y = anchor.origin.y + Math.random() * wiggle;
+        });
+      });
+    }
   }).play();
 }
 
@@ -92,22 +92,41 @@ function mapNumber(X,A,B,C,D) {
   return (X-A)/(B-A) * (D-C) + C;
 }
 
+
+function moveToCorrectPosition(item, atPosition, offset) {
+  if (!offset) offset = 0;
+  item.translation.set((atPosition * item.z) + offset, 0);
+  item.origTranslation = new Two.Vector().copy(item.translation);
+}
+
 function setupPerspective() {
   var front = I.scene.getById('Front'),
     back = I.scene.getById('Back'),
     sky = I.scene.getById('Sky');
   var buildings = I.scene.getById('City').children;
-  var text = I.scene.getById('TextEbene');
-  //var textChildren = I.selectAll('#Text > *');
+  var text = I.scene.getById('Text');
+  var textChildren = [];
 
 
 
   front.setDepth(-60);
   back.setDepth(20);
   //text.setDepth(-30);
-  // textChildren[0].setDepth(-30);
-  // textChildren[1].setDepth(-33);
-  // textChildren[2].setDepth(-45);
+  i = 0;
+  for (var id in text.children) {
+    textChildren.push(text.children[id]);
+  }
+  // Title
+  textChildren[0].setDepth(-8);
+  // MainText
+  textChildren[1].setDepth(-12);
+  // Arrow
+  textChildren[2].setDepth(-20);
+
+  textChildren.forEach(function (item) {
+    moveToCorrectPosition(item, -85);
+  });
+
   sky.setDepth(-2);
 
   for (var id in buildings) {
@@ -125,18 +144,27 @@ function setupPerspective() {
 
   function cloudMover(name, x) {
     var cloud = new KeyframedObject(I.scene.getById(name));
-    console.log(cloud.opacity);
-    cloud.addKeyframe(-80, {x:0, y:0, opacity:parseFloat(cloud.object.opacity*1.1)});
+    console.log(cloud.object.opacity);
+    cloud.addKeyframe(-85, {x:0, y:0, opacity:parseFloat(cloud.object.opacity*1.1)});
     cloud.addKeyframe(0, {x:x, y:0, opacity:0});
+    cloud.object.z = -80;
     //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
     return cloud;
   }
 
   function opacityMover(name, xFrom, xTo, oFrom, oTo) {
     var el = new KeyframedObject(I.scene.getById(name));
-    el.addKeyframe(-80, {x:xFrom, y:0, opacity:oFrom});
+    el.addKeyframe(-85, {x:xFrom, y:0, opacity:oFrom});
     el.addKeyframe(0, {x:xTo, y:0, opacity:oTo});
     //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
+    return el;
+  }
+
+  function gradientMover(name, xFrom, xTo, oFrom, oTo, gradient) {
+    var el = new KeyframedObject(I.scene.getById(name));
+    el.gradient = gradient;
+    el.addKeyframe(-70, {x:xFrom, y:0, gradient:oFrom, opacity: 0});
+    el.addKeyframe(0, {x:xTo, y:0, gradient:oTo, opacity: 1});
     return el;
   }
 
@@ -146,18 +174,19 @@ function setupPerspective() {
   keyFramedObjects.push(cloudMover('Cloud3', 400));
   keyFramedObjects.push(cloudMover('Cloud4', 400));
 //  keyFramedObjects.push(cloudMover('Cloud5', 200));
-  keyFramedObjects.push(cloudMover('Cloud6', -200));
+  keyFramedObjects.push(cloudMover('Cloud6', -500));
   keyFramedObjects.push(opacityMover('Rock', 0,0,0.4,1));
-
+  keyFramedObjects.push(opacityMover('Text', 0,0,1,0));
+  keyFramedObjects.push(gradientMover('RockBase1', 0, 0, 0, 100, new Rainbow().setSpectrum('#EA6219', '#5D514D').setNumberRange(0,100)));
 
   // Last call
-  curPos = -87;
+  curPos = -85;
   movePerspective(curPos);
 
 }
 
 function movePerspective(value) {
-  if (value < -85) value = -85;
+  if (value < -85) curPos = value = -85;
   I.scene.circularDisplace(value, 0, selected);
   keyFramedObjects.forEach(function (item) {
     var props = item.getInterpolated(value);
@@ -168,6 +197,9 @@ function movePerspective(value) {
     }
     if (props.opacity) {
       item.object.opacity = props.opacity;
+    }
+    if (props.gradient) {
+      item.object.fill = '#' + item.gradient.colourAt(props.gradient);
     }
   });
   //sun.transform('translate(0,' + 2.5*value + ')');

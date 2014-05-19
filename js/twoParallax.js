@@ -15,6 +15,9 @@ _.extend(Two.Group.prototype, methods, {
     if (!selected) selected = this.getByClassName('parallaxEnabled');
       selected.forEach(function (item) {
         var xShift = x * item.z;
+        if (item.origTranslation) {
+          xShift -= item.origTranslation.x;
+        }
         item.translation.set(xShift, 0);
       });
   }

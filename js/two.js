@@ -1817,6 +1817,11 @@ var Backbone = Backbone || {};
           });
         }
 
+        // Convert NodeMap to a normal object
+        _.each(node.attributes, function(v, k) {
+          attributes[v.nodeName] = v.nodeValue;
+        });
+
         // Getting the correct opacity is a bit tricky, since SVG path elements don't
         // support opacity as an attribute, but you can apply it via CSS.
         // So we take the opacity and set (stroke/fill)-opacity to the same value.
@@ -1825,13 +1830,12 @@ var Backbone = Backbone || {};
           styles['fill-opacity'] = styles.opacity;
         }
 
-        // Convert NodeMap to a normal object
-        _.each(node.attributes, function(v, k) {
-          attributes[v.nodeName] = v.nodeValue;
-        });
-
         // Merge attributes and applied styles (attributes take precedence)
         _.extend(styles, attributes);
+
+        // Similarly visibility is influenced by the value of both display and visibility.
+        // Calculate a unified value here
+        styles.visible = (styles.display != 'none') && (styles.visibility == 'visible')
 
         // Now iterate the whole thing
         _.each(styles, function(value, key) {
@@ -1851,8 +1855,8 @@ var Backbone = Backbone || {};
               // });
               // elem.setMatrix(matrix);
               break;
-            case 'visibility':
-              elem.visible = !!value;
+            case 'visible':
+              elem.visible = value;
               break;
             case 'stroke-linecap':
               elem.cap = value;
