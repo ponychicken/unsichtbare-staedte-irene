@@ -6,7 +6,7 @@ var keyFramedObjects = [];
 loadSVG();
 
 function loadSVG() {
-  $.get('/new1.svg', function(response) {
+  $.get('/new7.svg', function(response) {
     // TODO: Doc fragment
     var frag = $('#hiddenWrapper');
     frag.append(response);
@@ -23,6 +23,7 @@ function setup(frag) {
   I.interpret(frag.children()[0]);
 
   I.update();
+
   setupPerspective();
 
   var body = $('body')[0];
@@ -58,28 +59,28 @@ function setup(frag) {
   var pause = 0;
 
 
-  var wiggled = I.scene.getById('City').getByType(Two.Polygon);
-  _.extend(wiggled, I.scene.getById('Clouds').getByType(Two.Polygon));
-  wiggled.forEach(function(item) {
-    item.vertices.forEach(function(anchor) {
-      anchor.origin = new Two.Vector().copy(anchor);
-    });
-  });
+  // var wiggled = I.scene.getById('City').getByType(Two.Polygon);
+  // _.extend(wiggled, I.scene.getById('Clouds').getByType(Two.Polygon));
+  // wiggled.forEach(function(item) {
+  //   item.vertices.forEach(function(anchor) {
+  //     anchor.origin = new Two.Vector().copy(anchor);
+  //   });
+  // });
 
   I.bind('update', function(frameCount) {
     if (curPos != lastPos) {
       lastPos = curPos;
       movePerspective(curPos);
     }
-    if (!(frameCount % 5)) {
-      wiggled.forEach(function(item) {
-        item.vertices.forEach(function(anchor) {
-          var wiggle = (item.z) ? (item.z - 100)/-75 : 1.5;
-          anchor.x = anchor.origin.x + Math.random() * wiggle;
-          anchor.y = anchor.origin.y + Math.random() * wiggle;
-        });
-      });
-    }
+    // if (!(frameCount % 5)) {
+    //   wiggled.forEach(function(item) {
+    //     item.vertices.forEach(function(anchor) {
+    //       var wiggle = (item.z) ? (item.z - 100)/-75 : 1.5;
+    //       anchor.x = anchor.origin.x + Math.random() * wiggle;
+    //       anchor.y = anchor.origin.y + Math.random() * wiggle;
+    //     });
+    //   });
+    // }
   }).play();
 }
 
@@ -97,16 +98,16 @@ function setupPerspective() {
     sky = I.scene.getById('Sky');
   var buildings = I.scene.getById('City').children;
   var text = I.scene.getById('TextEbene');
-  var textChildren = I.selectAll('#Text > *');
+  //var textChildren = I.selectAll('#Text > *');
 
 
 
   front.setDepth(-60);
   back.setDepth(20);
   //text.setDepth(-30);
-  textChildren[0].setDepth(-30);
-  textChildren[1].setDepth(-33);
-  textChildren[2].setDepth(-45);
+  // textChildren[0].setDepth(-30);
+  // textChildren[1].setDepth(-33);
+  // textChildren[2].setDepth(-45);
   sky.setDepth(-2);
 
   for (var id in buildings) {
@@ -114,27 +115,25 @@ function setupPerspective() {
     var bbox = item.getBoundingClientRect();
     // Between 900 (near) and 500 (far)
     // Middle at 680
-    var shift = -(bbox.y2 - 680);
-    console.log("Shift", shift);
+    var shift = -(bbox.bottom - 680);
     var z = mapNumber(shift, -250, 200, -15, 10);
-    //console.log(z);
     item.setDepth(z);
-  });
+  }
 
  selected = I.scene.getByClassName('parallaxEnabled');
 
 
   function cloudMover(name, x) {
-    var cloud = new KeyframedObject(I.select(name));
-    console.log(cloud.object.attr('opacity'));
-    cloud.addKeyframe(-80, {x:0, y:0, opacity:parseFloat(cloud.object.attr('opacity')*1.1)});
+    var cloud = new KeyframedObject(I.scene.getById(name));
+    console.log(cloud.opacity);
+    cloud.addKeyframe(-80, {x:0, y:0, opacity:parseFloat(cloud.object.opacity*1.1)});
     cloud.addKeyframe(0, {x:x, y:0, opacity:0});
     //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
     return cloud;
   }
 
   function opacityMover(name, xFrom, xTo, oFrom, oTo) {
-    var el = new KeyframedObject(I.select(name));
+    var el = new KeyframedObject(I.scene.getById(name));
     el.addKeyframe(-80, {x:xFrom, y:0, opacity:oFrom});
     el.addKeyframe(0, {x:xTo, y:0, opacity:oTo});
     //cloud.addKeyframe(20, {x:x, y:0, opacity:0});
@@ -142,15 +141,13 @@ function setupPerspective() {
   }
 
   // Setup clouds
-  keyFramedObjects.push(cloudMover('#Cloud1', -400));
-  keyFramedObjects.push(cloudMover('#Cloud2', -900));
-  keyFramedObjects.push(cloudMover('#Cloud3', 400));
-  keyFramedObjects.push(cloudMover('#Cloud4', 400));
-  keyFramedObjects.push(cloudMover('#Cloud5', 200));
-  keyFramedObjects.push(cloudMover('#Cloud6', -200));
-  keyFramedObjects.push(opacityMover('#Rock', 0,0,0.4,1));
-
-
+  keyFramedObjects.push(cloudMover('Cloud1', -400));
+  keyFramedObjects.push(cloudMover('Cloud2', -900));
+  keyFramedObjects.push(cloudMover('Cloud3', 400));
+  keyFramedObjects.push(cloudMover('Cloud4', 400));
+//  keyFramedObjects.push(cloudMover('Cloud5', 200));
+  keyFramedObjects.push(cloudMover('Cloud6', -200));
+  keyFramedObjects.push(opacityMover('Rock', 0,0,0.4,1));
 
 
   // Last call
@@ -167,18 +164,15 @@ function movePerspective(value) {
 
     // Special casing
     if (props.x || props.y) {
-      console.log("Putting a cloud at", props.x );
-      item.object.transform('translate(' + props.x + ',' + props.y + ')');
+      item.object.translation.set(props.x, props.y);
     }
     if (props.opacity) {
-      console.log('opacity:', props.opacity);
-      item.object.attr({opacity: props.opacity});
+      item.object.opacity = props.opacity;
     }
   });
   //sun.transform('translate(0,' + 2.5*value + ')');
   //var color = gradientYellowWhite.colourAt(value);
   //I.getById('SkyBack').attr({fill: color});
-  console.log("At perspective value", value);
 }
 
 

@@ -1801,15 +1801,42 @@ var Backbone = Backbone || {};
         return matrix;
 
       },
-
+      /**
+       * Walk through item properties and pick the ones of interest.
+       * Will try to resolve styles applied via CSS
+       */
       applySvgAttributes: function(node, elem) {
+        var attributes = {}, styles = {};
 
+        // Not available in non browser environments
+        if (getComputedStyle) {
+          // Convert CSSStyleDeclaration to a normal object
+          var computedStyles = getComputedStyle(node);
+          _.each(computedStyles, function (item) {
+            styles[item] = computedStyles[item];
+          });
+        }
+
+        // Getting the correct opacity is a bit tricky, since SVG path elements don't
+        // support opacity as an attribute, but you can apply it via CSS.
+        // So we take the opacity and set (stroke/fill)-opacity to the same value.
+        if (styles.opacity != undefined) {
+          styles['stroke-opacity'] = styles.opacity;
+          styles['fill-opacity'] = styles.opacity;
+        }
+
+        // Convert NodeMap to a normal object
         _.each(node.attributes, function(v, k) {
+          attributes[v.nodeName] = v.nodeValue;
+        });
 
-          var property = v.nodeName;
+        // Merge attributes and applied styles (attributes take precedence)
+        _.extend(styles, attributes);
 
-          switch (property) {
+        // Now iterate the whole thing
+        _.each(styles, function(value, key) {
 
+          switch (key) {
             case 'transform':
 
               // TODO:
@@ -1825,40 +1852,39 @@ var Backbone = Backbone || {};
               // elem.setMatrix(matrix);
               break;
             case 'visibility':
-              elem.visible = !!v.nodeValue;
+              elem.visible = !!value;
               break;
             case 'stroke-linecap':
-              elem.cap = v.nodeValue;
+              elem.cap = value;
               break;
             case 'stroke-linejoin':
-              elem.join = v.nodeValue;
+              elem.join = value;
               break;
             case 'stroke-miterlimit':
-              elem.miter = v.nodeValue;
+              elem.miter = value;
               break;
             case 'stroke-width':
-              elem.linewidth = parseFloat(v.nodeValue);
+              elem.linewidth = parseFloat(value);
               break;
             case 'stroke-opacity':
             case 'fill-opacity':
             case 'opacity':
-              elem.opacity = parseFloat(v.nodeValue);
+              elem.opacity = parseFloat(value);
               break;
             case 'fill':
             case 'stroke':
-              elem[property] = (v.nodeValue == 'none') ? 'transparent' : v.nodeValue;
+              elem[key] = (value == 'none') ? 'transparent' : value;
               break;
             case 'id':
-              elem.id = v.nodeValue;
+              elem.id = value;
               break;
             case 'class':
               if (!elem.classList) elem.classList = [];
-              v.nodeValue.split(' ').forEach(function (cl) {
+              value.split(' ').forEach(function (cl) {
                 elem.classList.push(cl);
               });
               break;
           }
-
         });
 
         return elem;
@@ -5917,9 +5943,12 @@ var Backbone = Backbone || {};
         },
         set: function(v) {
           this[secret] = v;
-          _.each(this.children, function(child) { // Trickle down styles
-            child[k] = v;
-          });
+          // Is this really necessary?
+          // Imagine a group with opacity 0.5 and a few children.
+          // Setting the childrens opacity to 0.5 as well will changes the appearance.
+          // _.each(this.children, function(child) { // Trickle down styles
+          //   child[k] = v;
+          // });
         }
       });
 
