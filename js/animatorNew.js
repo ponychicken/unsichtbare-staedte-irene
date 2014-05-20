@@ -6,7 +6,7 @@ var keyFramedObjects = [];
 loadSVG();
 
 function loadSVG() {
-  $.get('/new10 Kopie.svg', function(response) {
+  $.get('/new12 Kopie.svg', function(response) {
     // TODO: Doc fragment
     var frag = $('#hiddenWrapper');
     frag.append(response);
@@ -104,7 +104,9 @@ function setupPerspective() {
     back = I.scene.getById('Back'),
     sky = I.scene.getById('Sky');
   var buildings = I.scene.getById('City').children;
+  var tents = I.scene.getById('GolfCity').children;
   var text = I.scene.getById('Text');
+
   var textChildren = [];
 
 
@@ -127,6 +129,10 @@ function setupPerspective() {
     moveToCorrectPosition(item, -85);
   });
 
+
+
+
+
   sky.setDepth(-2);
 
   for (var id in buildings) {
@@ -138,6 +144,20 @@ function setupPerspective() {
     var z = mapNumber(shift, -250, 200, -15, 10);
     item.setDepth(z);
   }
+
+  for (var id in tents) {
+    var item = tents[id];
+    var bbox = item.getBoundingClientRect();
+    // Between 900 (near) and 500 (far)
+    // Middle at 680
+    var shift = -(bbox.bottom - 680);
+    var z = mapNumber(shift, -250, 200, -15, 10);
+    item.setDepth(z);
+
+    moveToCorrectPosition(item, 300);
+  }
+
+
 
  selected = I.scene.getByClassName('parallaxEnabled');
 
