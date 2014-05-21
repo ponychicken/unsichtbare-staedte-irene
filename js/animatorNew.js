@@ -60,14 +60,14 @@ function setup(frag) {
 
 
   var savePosition = function (name) {
-    var weird = I.scene.getById(name).getByType(Two.Polygon)
+    var weird = I.scene.getById(name).getByType(Two.Polygon);
     weird.forEach(function(item) {
       item.vertices.forEach(function(anchor) {
         anchor.origin = new Two.Vector().copy(anchor);
       });
     });
     return weird;
-  }
+  };
 
   var wiggle = function (item) {
     item.vertices.forEach(function(anchor) {
@@ -75,7 +75,7 @@ function setup(frag) {
       anchor.x = anchor.origin.x + Math.random() * wiggle;
       anchor.y = anchor.origin.y + Math.random() * wiggle;
     });
-  }
+  };
 
   var CityWiggler = savePosition('City');
   var GolfWiggler = savePosition('GolfCity');
@@ -96,7 +96,7 @@ function setup(frag) {
       if (curPos > 150) {
         GolfWiggler.forEach(wiggle);
       }
-      //CloudWiggler.forEach(wiggle);
+      CloudWiggler.forEach(wiggle);
     }
   }).play();
 }
