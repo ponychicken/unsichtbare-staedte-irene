@@ -8,13 +8,12 @@ KeyframedObject.prototype.addKeyframe = function (t, data) {
   data.time = t;
   this.keyframes[t] = data;
   this.keyframeIndex.push(t);
-  this.keyframeIndex.sort();
+  this.keyframeIndex.sort(function (a, b) {
+    return a - b;
+  });
 }
 
 KeyframedObject.prototype.getInterpolated = function (wantedT) {
-  function isNum(v) {
-    return typeof v == 'number'
-  }
   var a,b;
   // Exact match?
   if (this.keyframes[wantedT]) {
@@ -24,7 +23,7 @@ KeyframedObject.prototype.getInterpolated = function (wantedT) {
   for (var i = 0; i < this.keyframeIndex.length; i++) {
     var t = this.keyframeIndex[i];
     if (t < wantedT) {
-      var a = t
+      var a = t;
     } else if (t > wantedT && b == undefined) {
       var b = t;
       break;
@@ -32,11 +31,11 @@ KeyframedObject.prototype.getInterpolated = function (wantedT) {
   }
 
   // Return
-  if (isNum(a) && isNum(b)) {
+  if (_.isNumber(a) && _.isNumber(b)) {
     return this.interpolateObjects(this.keyframes[a], this.keyframes[b], wantedT);
-  } else if (isNum(a)) {
+  } else if (_.isNumber(a)) {
     return this.keyframes[a];
-  } else if (isNum(b)) {
+  } else if (_.isNumber(b)) {
     return this.keyframes[b];
   } else {
     return {};
