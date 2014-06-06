@@ -7,7 +7,6 @@ loadSVG();
 
 function loadSVG() {
   $.get('/new12 Kopie.svg', function(response) {
-    // TODO: Doc fragment
     var frag = $('#hiddenWrapper');
     frag.append(response);
     setup(frag);
@@ -80,9 +79,6 @@ function setup(frag) {
   var CityWiggler = savePosition('City');
   var GolfWiggler = savePosition('GolfCity');
   var CloudWiggler = savePosition('Clouds');
-
-
-  //
 
   I.bind('update', function(frameCount) {
     if (curPos != lastPos) {
@@ -179,7 +175,7 @@ function setupPerspective() {
 
 
 
- selected = I.scene.getByClassName('parallaxEnabled');
+  selected = I.scene.getByClassName('parallaxEnabled');
 
 
   function cloudMover(name, x) {
