@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=768, minimal-ui">
+<meta name="viewport" content="width=device-width, minimal-ui, viewport-fit=cover">
 <title>Irene</title>
 <link rel="apple-touch-icon" sizes="152x152" href="icon.png">
 <script src="js/zepto.js"></script>
@@ -36,14 +37,22 @@
   font-weight:  400;
 }
 
+html {
+  margin: 0!important;
+  padding: 0!important;
+}
 
 body {
-  margin: 0;
-  padding: 0;
+  background: #212221;
+  margin: 0!important;
+  padding: 0!important;
 }
 #wrapper {
-  /*height: 748px;*/
-  overflow:hidden;
+  height: 1024px;
+  overflow: hidden;
+  width: 768px;
+  margin: auto;
+  margin-top: calc( ( 100vh - 1024px ) / 2 );
 }
 </style>
 <body>
