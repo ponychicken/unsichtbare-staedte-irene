@@ -6,7 +6,7 @@ var keyFramedObjects = [];
 loadSVG();
 
 function loadSVG() {
-  $.get('/new12 Kopie.svg', function(response) {
+  $.get('new12 Kopie.svg', function(response) {
     var frag = $('#hiddenWrapper');
     frag.append(response);
     setup(frag);
